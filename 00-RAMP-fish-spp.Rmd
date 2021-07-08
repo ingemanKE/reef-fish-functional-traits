@@ -1,0 +1,50 @@
+---
+title: "00_RAMP_data"
+author: "Kurt Ingeman"
+date: "7/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+
+rm(list = ls())
+
+library(here)
+library(dplyr)
+```
+
+
+```{r}
+# read in all fish obs for RAMP 2010 - 2017
+df <- read.csv(here("Data", "RAMP_fish_2010-2017.csv"))
+
+# 677 unique spp
+length(unique(df$SPECIES))
+
+spp_location <- df %>% 
+  select(REGION, ISLAND, SPECIES, TAXONNAME, FAMILY, CONSUMER_GROUP) %>% 
+  group_by(ISLAND, SPECIES) %>%
+  slice(1)
+
+spp_guam <- spp_location %>% 
+  filter(ISLAND == "Guam")
+
+# 677 unique spp
+length(unique(spp_guam$SPECIES))
+
+
+write.csv(x = spp_location , file = here("Data", "RAMP_species_by_island.csv"))
+write.csv(x = spp_guam , file = here("Data", "RAMP_species_guam.csv"))
+```
+
+## NOAA RAMP csv file too large for GitHub, removing and using reduced files going forward
+
+```{r}
+df <- read.csv(here("Data", "RAMP_species_by_island.csv"))
+
+```
+
