@@ -9,9 +9,40 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+rm(list = ls())
+```
+
 
 ```{r}
+# install.packages("rfishbase")
 library(rfishbase)
+library(here)
+library(dplyr)
+```
+
+```{r}
+
+# read in guam species list 
+df <- read.csv(here("Data", "RAMP_species_guam.csv"))
+
+# turn taxon name into vector of chr to pull fb traits
+spp <- df$TAXONNAME
+
+# pull from fb on each species information 
+traits <- species(spp)
+
+# rejoin with original data
+traits <- left_join(df, traits, by = c("TAXONNAME" = "Species"))
+
+head(traits)
+
+spp_diet <- diet(spp) %>% 
+  group_by(Species) %>% 
+  summarise(mean_diet_trophic <- mean(Troph, na.rm = T))
+
+## Put into Drive: Trait data
+write.csv(x = traits , file = here("Data", "Guam_spp_traits.csv"))
 
 ```
 
