@@ -2,7 +2,7 @@
 title: "02-data-project"
 author: "Kurt Ingeman"
 date: "9/20/2021"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list = ls())
 ```
 
-```{r}
+This is going to be a chunk of code
+
+```{r include=FALSE}
 
 library(dplyr)
 library(ggplot2)
@@ -33,7 +35,7 @@ sum(df$N) # 1217 surveys
 
 # remove standard error columns for reshape
 df_wide <- df %>% 
-  select(!contains("_SE"))
+  select(!contains("_SE")) 
 
 # reshape data 
 df_long <- df_wide %>% 
@@ -50,6 +52,8 @@ spp <- read.csv(here("Data", "FISH_SPECIES_04-21-2020.csv")) %>%
 # merge with species list to incorporate trophic groups 
 df_long <-  left_join(df_long, spp, by = "SPECIES") %>% 
   select(-X)
+
+
 
 
 ```
@@ -75,16 +79,18 @@ surveys_by_year <- df_long %>%
 
 richness_surveys_year <- left_join(richness_by_yr, surveys_by_year, by = "ANALYSIS_YEAR") %>% 
   group_by(ANALYSIS_YEAR) %>% 
-  mutate(spp_per_survey = RICHNESS / ANNUAL_SURVEYS) %>% ungroup()
+  mutate(spp_per_survey = RICHNESS / ANNUAL_SURVEYS)
 
 richness_surveys_year %>%
   kbl() %>%
   kable_classic_2(full_width = F)
-  
-df_long <- left_join(df_long, richness_surveys_year, by = "ANALYSIS_YEAR")
 
+```
 ###
 
+```{r}
+
+df_long <- left_join(df_long, richness_surveys_year, by = "ANALYSIS_YEAR")
 
 richness_sector <- df_long %>% 
   group_by(ANALYSIS_YEAR, SECTOR) %>% 
@@ -112,13 +118,13 @@ ggplot(data = richness_sector, aes(x = RICHNESS, y = SURVEYS)) +
   geom_point() +
   geom_smooth(method = "lm")
 
+```
+
+
+```{r}
 ggplot(data = richness_sector, aes(x = RICHNESS, y = SURVEYS, color = factor(ANALYSIS_YEAR))) +
   geom_point() +
   geom_smooth(method = "lm")
-
-
-
-
 ```
 
 # data calculations
@@ -136,7 +142,13 @@ ggplot(df_troph, aes(x = TROPHIC_MONREP, y = TROPHIC_DENSE)) +
   geom_bar(stat = "identity") + 
   theme(axis.text.x = element_text(angle = 45, hjust=1))
   
+
+```
+
+### Facet by year and by sector 
+```{r}
   
+
  ggplot(df_troph, aes(x = TROPHIC_MONREP, y = TROPHIC_DENSE)) +
   geom_bar(stat = "identity") + 
   facet_grid( vars(YEAR), vars(SECTOR)) +
@@ -154,11 +166,13 @@ dt %>%
 
 dt %>%
   kbl() %>%
-  kable_paper("hover", full_width = F)
+  kable_classic_2(full_width = F)
 
 dt %>%
   kbl() %>%
-  kable_classic_2(full_width = F)
+  kable_paper("hover", full_width = F)
+
+
 ```
 
 
